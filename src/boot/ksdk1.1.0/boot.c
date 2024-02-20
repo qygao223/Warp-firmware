@@ -76,17 +76,21 @@
 /*
 * Include all sensors because they will be needed to decode flash.
 */
-#include "devADXL362.h"
-#include "devAMG8834.h"
 #include "devMMA8451Q.h"
-#include "devMAG3110.h"
-#include "devL3GD20H.h"
-#include "devBME680.h"
-#include "devBMX055.h"
-#include "devCCS811.h"
-#include "devHDC1000.h"
-#include "devRV8803C7.h"
 
+#if (!WARP_BUILD_ENABLE_FRDMKL03)
+	#include "devADXL362.h"
+	#include "devAMG8834.h"
+	#include "devMAG3110.h"
+	#include "devL3GD20H.h"
+	#include "devBME680.h"
+	#include "devBMX055.h"
+	#include "devCCS811.h"
+	#include "devHDC1000.h"
+	#include "devRV8803C7.h"
+#endif
+
+#include "devSSD1331.h"
 
 #if (WARP_BUILD_ENABLE_DEVADXL362)
 	volatile WarpSPIDeviceState			deviceADXL362State;
@@ -1182,7 +1186,7 @@ printPinDirections(void)
 	OSA_TimeDelay(100);
 	warpPrint("SPI_SCK_I2C_PULLUP_EN:%d\n", GPIO_DRV_GetPinDir(kWarpPinSPI_SCK_I2C_PULLUP_EN));
 	OSA_TimeDelay(100);
-				warpPrint("ADXL362_CS:%d\n", GPIO_DRV_GetPinDir(kWarpPinADXL362_CS));
+	warpPrint("ADXL362_CS:%d\n", GPIO_DRV_GetPinDir(kWarpPinADXL362_CS));
 				OSA_TimeDelay(100);
 }
 */
@@ -1674,7 +1678,7 @@ main(void)
 #endif
 
 #if (WARP_BUILD_ENABLE_DEVMMA8451Q)
-		initMMA8451Q(	0x1C	/* i2cAddress */,	kWarpDefaultSupplyVoltageMillivoltsMMA8451Q	);
+		initMMA8451Q(	0x1D	/* i2cAddress */,	kWarpDefaultSupplyVoltageMillivoltsMMA8451Q	);
 #endif
 
 #if (WARP_BUILD_ENABLE_DEVLPS25H)
@@ -1916,6 +1920,7 @@ main(void)
 
 	bool _originalWarpExtraQuietMode = gWarpExtraQuietMode;
 	gWarpExtraQuietMode = false;
+	devSSD1331init();
 	warpPrint("Press any key to show menu...\n");
 	gWarpExtraQuietMode = _originalWarpExtraQuietMode;
 

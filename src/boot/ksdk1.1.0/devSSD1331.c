@@ -77,7 +77,7 @@ devSSD1331init(void)
 	PORT_HAL_SetMuxMode(PORTA_BASE, 8u, kPortMuxAlt3);
 	PORT_HAL_SetMuxMode(PORTA_BASE, 9u, kPortMuxAlt3);
 
-	enableSPIpins();
+	warpEnableSPIpins();
 
 	/*
 	 *	Override Warp firmware's use of these pins.
@@ -161,8 +161,19 @@ devSSD1331init(void)
 	 *	Any post-initialization drawing commands go here.
 	 */
 	//...
+	// set contrast to birghtest
+	writeCommand(kSSD1331CommandCONTRASTA);		// 0x81
+	writeCommand(0xFF);
+	writeCommand(kSSD1331CommandCONTRASTB);		// 0x82
+	writeCommand(0xFF);
+	writeCommand(kSSD1331CommandCONTRASTC);		// 0x83
+	writeCommand(0xFF);
 
+	// set current for max contrast
+	writeCommand(kSSD1331CommandMASTERCURRENT);	// 0x87
+	writeCommand(0x0F);
 
-
+	//enable the whole screen
+	writeCommand(kSSD1331CommandDISPLAYALLON);
 	return 0;
 }

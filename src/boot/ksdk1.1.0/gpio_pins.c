@@ -124,6 +124,7 @@ gpio_output_pin_user_config_t	outputPins[] = {
 			.pinName = kWarpPinTPS62740_VSEL4,
 			.config.outputLogic = 1,
 			.config.slewRate = kPortSlowSlewRate,
+
 			.config.driveStrength = kPortLowDriveStrength,
 		},
 		{
@@ -203,7 +204,7 @@ gpio_input_pin_user_config_t	inputPins[] = {
  *
  *	**NOTE**:	The semantics is that pins that are excluded are disabled (TODO: double check).
  */
-gpio_input_pin_user_config_t	wakeupPins[] = {
+/*gpio_input_pin_user_config_t	wakeupPins[] = {
 	{
 		.pinName = kWarpPinUnusedPTA0,
 		.config.isPullEnable = true,
@@ -215,3 +216,4 @@ gpio_input_pin_user_config_t	wakeupPins[] = {
 		.pinName = GPIO_PINS_OUT_OF_RANGE,
 	}
 };
+*/
