@@ -53,7 +53,31 @@ gpio_output_pin_user_config_t	outputPins[] = {
 		},
 		*/
 		{
-			.pinName = kWarpPinADXL362_SPI_nCS,
+			.pinName = kSSD1331PinMOSI,
+			.config.outputLogic = 1,
+			.config.slewRate = kPortSlowSlewRate,
+			.config.driveStrength = kPortLowDriveStrength,
+		},
+		{
+			.pinName = kSSD1331PinSCK,
+			.config.outputLogic = 1,
+			.config.slewRate = kPortSlowSlewRate,
+			.config.driveStrength = kPortLowDriveStrength,
+		},
+		{
+			.pinName = kSSD1331PinCSn,
+			.config.outputLogic = 1,
+			.config.slewRate = kPortSlowSlewRate,
+			.config.driveStrength = kPortLowDriveStrength,
+		},
+		{
+			.pinName = kSSD1331PinDC,
+			.config.outputLogic = 1,
+			.config.slewRate = kPortSlowSlewRate,
+			.config.driveStrength = kPortLowDriveStrength,
+		},
+		{
+			.pinName = kSSD1331PinRST,
 			.config.outputLogic = 1,
 			.config.slewRate = kPortSlowSlewRate,
 			.config.driveStrength = kPortLowDriveStrength,
@@ -124,7 +148,6 @@ gpio_output_pin_user_config_t	outputPins[] = {
 			.pinName = kWarpPinTPS62740_VSEL4,
 			.config.outputLogic = 1,
 			.config.slewRate = kPortSlowSlewRate,
-
 			.config.driveStrength = kPortLowDriveStrength,
 		},
 		{
@@ -204,7 +227,7 @@ gpio_input_pin_user_config_t	inputPins[] = {
  *
  *	**NOTE**:	The semantics is that pins that are excluded are disabled (TODO: double check).
  */
-/*gpio_input_pin_user_config_t	wakeupPins[] = {
+gpio_input_pin_user_config_t	wakeupPins[] = {
 	{
 		.pinName = kWarpPinUnusedPTA0,
 		.config.isPullEnable = true,
@@ -216,4 +239,3 @@ gpio_input_pin_user_config_t	inputPins[] = {
 		.pinName = GPIO_PINS_OUT_OF_RANGE,
 	}
 };
-*/

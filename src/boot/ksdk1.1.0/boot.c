@@ -61,7 +61,7 @@
 #include "errstrs.h"
 #include "gpio_pins.h"
 #include "SEGGER_RTT.h"
-
+#include "devSSD1331.h"
 
 #define							kWarpConstantStringI2cFailure		"\rI2C failed, reg 0x%02x, code %d\n"
 #define							kWarpConstantStringErrorInvalidVoltage	"\rInvalid supply voltage [%d] mV!"
@@ -76,21 +76,17 @@
 /*
 * Include all sensors because they will be needed to decode flash.
 */
+#include "devADXL362.h"
+#include "devAMG8834.h"
 #include "devMMA8451Q.h"
+#include "devMAG3110.h"
+#include "devL3GD20H.h"
+#include "devBME680.h"
+#include "devBMX055.h"
+#include "devCCS811.h"
+#include "devHDC1000.h"
+#include "devRV8803C7.h"
 
-#if (!WARP_BUILD_ENABLE_FRDMKL03)
-	#include "devADXL362.h"
-	#include "devAMG8834.h"
-	#include "devMAG3110.h"
-	#include "devL3GD20H.h"
-	#include "devBME680.h"
-	#include "devBMX055.h"
-	#include "devCCS811.h"
-	#include "devHDC1000.h"
-	#include "devRV8803C7.h"
-#endif
-
-#include "devSSD1331.h"
 
 #if (WARP_BUILD_ENABLE_DEVADXL362)
 	volatile WarpSPIDeviceState			deviceADXL362State;
@@ -188,6 +184,10 @@
 #if (WARP_BUILD_ENABLE_DEVBGX)
 	#include "devBGX.h"
 	volatile WarpUARTDeviceState			deviceBGXState;
+#endif
+
+#if (WARP_BUILD_ENABLE_DEVSSD1331)
+	volatile WarpSPIDeviceState			deviceSSD1331State;
 #endif
 
 typedef enum
@@ -1186,7 +1186,7 @@ printPinDirections(void)
 	OSA_TimeDelay(100);
 	warpPrint("SPI_SCK_I2C_PULLUP_EN:%d\n", GPIO_DRV_GetPinDir(kWarpPinSPI_SCK_I2C_PULLUP_EN));
 	OSA_TimeDelay(100);
-	warpPrint("ADXL362_CS:%d\n", GPIO_DRV_GetPinDir(kWarpPinADXL362_CS));
+				warpPrint("ADXL362_CS:%d\n", GPIO_DRV_GetPinDir(kWarpPinADXL362_CS));
 				OSA_TimeDelay(100);
 }
 */
@@ -1671,6 +1671,12 @@ main(void)
 /*
  *	Initialize all the sensors
  */
+#if (WARP_BUILD_ENABLE_DEVSSD1331) 
+{
+		devSSD1331init();
+}
+#endif
+
 #if (WARP_BUILD_ENABLE_DEVBMX055)
 		initBMX055accel(0x18	/* i2cAddress */,	kWarpDefaultSupplyVoltageMillivoltsBMX055accel	);
 		initBMX055gyro(	0x68	/* i2cAddress */,	kWarpDefaultSupplyVoltageMillivoltsBMX055gyro	);
@@ -1920,7 +1926,6 @@ main(void)
 
 	bool _originalWarpExtraQuietMode = gWarpExtraQuietMode;
 	gWarpExtraQuietMode = false;
-	devSSD1331init();
 	warpPrint("Press any key to show menu...\n");
 	gWarpExtraQuietMode = _originalWarpExtraQuietMode;
 

@@ -34,9 +34,9 @@
 
 enum _gpio_pins
 {
-	//kWarpPinUnusedPTA0			= GPIO_MAKE_PIN(HW_GPIOA, 0),	/*	PTA0: Reserved for SWD CLK	*/
-	//kWarpPinUnusedPTA1			= GPIO_MAKE_PIN(HW_GPIOA, 1),	/*	PTA1: Reserved for SWD RESET_B	*/
-	//kWarpPinUnusedPTA2			= GPIO_MAKE_PIN(HW_GPIOA, 2),	/*	PTA2: Reserved for SWD DIO	*/
+	/*kWarpPinUnusedPTA0			= GPIO_MAKE_PIN(HW_GPIOA, 0),	/*	PTA0: Reserved for SWD CLK	*/
+	/*kWarpPinUnusedPTA1			= GPIO_MAKE_PIN(HW_GPIOA, 1),	/*	PTA1: Reserved for SWD RESET_B	*/
+	/*kWarpPinUnusedPTA2			= GPIO_MAKE_PIN(HW_GPIOA, 2),	/*	PTA2: Reserved for SWD DIO	*/
 	kWarpPinEXTAL0				= GPIO_MAKE_PIN(HW_GPIOA, 3),	/*	PTA3: Reserved for EXTAL0	*/
 	kWarpPinXTAL0				= GPIO_MAKE_PIN(HW_GPIOA, 4),	/*	PTA4: Reserved for XTAL0	*/
 
@@ -108,6 +108,11 @@ enum _gpio_pins
 		kWarpPinTPS62740_VSEL1			= GPIO_MAKE_PIN(HW_GPIOB, 11),
 		kWarpPinCLKOUT32K			= GPIO_MAKE_PIN(HW_GPIOB, 13),
 	#endif
+	kSSD1331PinMOSI		= GPIO_MAKE_PIN(HW_GPIOA, 8),
+	kSSD1331PinSCK		= GPIO_MAKE_PIN(HW_GPIOA, 9),
+	kSSD1331PinCSn		= GPIO_MAKE_PIN(HW_GPIOB, 13),
+	kSSD1331PinDC		= GPIO_MAKE_PIN(HW_GPIOA, 12),
+	kSSD1331PinRST		= GPIO_MAKE_PIN(HW_GPIOB, 0),
 };
 
 extern gpio_input_pin_user_config_t	inputPins[];
