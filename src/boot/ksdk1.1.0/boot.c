@@ -2718,7 +2718,7 @@ main(void)
 				uint8_t reg = readHexByte();
 				warpPrint("\r\nEnter numberOfBytes (1)\n");
 				int numberOfBytes = warpWaitKey();*/
-				warpPrint("\r\n\hexModeFlag? ['0' | '1']> ");
+				warpPrint("\r\n\thexModeFlag? ['0' | '1']> ");
 				bool hexModeFlag = warpWaitKey() - '0';
 				printSensorDataINA219(hexModeFlag);
 			}
