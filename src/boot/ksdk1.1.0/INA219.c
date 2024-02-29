@@ -40,8 +40,7 @@ initINA219(const uint8_t i2cAddress, uint16_t operatingVoltageMillivolts)
 WarpStatus
 writeSensorRegisterINA219(uint8_t deviceRegister, uint16_t payload)
 {
-	uint16_t		payloadByte[1]; 
-    uint8_t     commandByte[1];
+    uint8_t     payloadByte[2], commandByte[1];
 	i2c_status_t	status;
 
 	switch (deviceRegister)
@@ -67,7 +66,8 @@ writeSensorRegisterINA219(uint8_t deviceRegister, uint16_t payload)
 
 	warpScaleSupplyVoltage(deviceINA219State.operatingVoltageMillivolts);
 	commandByte[0] = deviceRegister;
-	payloadByte[0] = payload;
+	payloadByte[0] = (payload >> 8) & 0xFF; // MSB
+    payloadByte[1] = payload & 0xFF; // LSB
 	warpEnableI2Cpins();
 
 	status = I2C_DRV_MasterSendDataBlocking(
@@ -76,7 +76,7 @@ writeSensorRegisterINA219(uint8_t deviceRegister, uint16_t payload)
 		commandByte,
 		1,
 		payloadByte,
-		1,
+		2,
 		gWarpI2cTimeoutMilliseconds);
 	if (status != kStatus_I2C_Success)
 	{
@@ -87,7 +87,7 @@ writeSensorRegisterINA219(uint8_t deviceRegister, uint16_t payload)
 }
 
 WarpStatus
-configureSensorINA219(uint8_t payload_Config, uint8_t payload_Calibration)
+configureSensorINA219(uint16_t payload_Config, uint16_t payload_Calibration)
 {
 	WarpStatus	i2cWriteStatus1, i2cWriteStatus2;
 
@@ -95,8 +95,7 @@ configureSensorINA219(uint8_t payload_Config, uint8_t payload_Calibration)
 	warpScaleSupplyVoltage(deviceINA219State.operatingVoltageMillivolts);
 
 	i2cWriteStatus1 = writeSensorRegisterINA219(kWarpSensorConfigurationRegisterINA219 /* register address config */,
-												  payload_Config /* payload: Disable FIFO */
-	);
+												  payload_Config );
 
     i2cWriteStatus2 = writeSensorRegisterINA219(kWarpSensorCalibrationRegisterINA219 /* register address need to add to warp.h 0x00 */,
 							payload_Calibration /* payload: Should be user input*/
