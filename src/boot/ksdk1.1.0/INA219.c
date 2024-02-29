@@ -110,8 +110,7 @@ readSensorRegisterINA219(uint8_t deviceRegister, int numberOfBytes)
 {
 	uint8_t		cmdBuf[1] = {0xFF};
 	i2c_status_t	status;
-
-
+    
 	USED(numberOfBytes);
 	switch (deviceRegister)
 	{

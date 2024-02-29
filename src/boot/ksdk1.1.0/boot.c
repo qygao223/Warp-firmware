@@ -2074,6 +2074,7 @@ main(void)
 		warpPrint("\r- 's': power up all sensors.\n");
 		warpPrint("\r- 't': dump processor state.\n");
 		warpPrint("\r- 'u': set I2C address.\n");
+		warpPrint("\r- 'v': Try read INA219.\n");
 
 #if (WARP_BUILD_ENABLE_DEVAT45DB)
 		warpPrint("\r- 'R': read bytes from Flash.\n");
@@ -2710,6 +2711,14 @@ main(void)
 				}
 
 				break;
+			}
+			case 'v':
+			{	
+				warpPrint("\r\nEnter register (00)\n");
+				uint8_t reg = readHexByte();
+				warpPrint("\r\nEnter numberOfBytes (1)\n");
+				int numberOfBytes = warpWaitKey();
+				readSensorRegisterINA219(reg, numberOfBytes)
 			}
 #if (WARP_BUILD_ENABLE_DEVRV8803C7)
 			case 'v':
