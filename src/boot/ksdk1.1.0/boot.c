@@ -62,6 +62,7 @@
 #include "gpio_pins.h"
 #include "SEGGER_RTT.h"
 #include "devSSD1331.h"
+#include "INA219.h"
 
 #define							kWarpConstantStringI2cFailure		"\rI2C failed, reg 0x%02x, code %d\n"
 #define							kWarpConstantStringErrorInvalidVoltage	"\rInvalid supply voltage [%d] mV!"
@@ -190,6 +191,10 @@
 	volatile WarpSPIDeviceState			deviceSSD1331State;
 #endif
 
+#if (WARP_BUILD_ENABLE_INA219)
+	volatile WarpI2CDeviceState			deviceINA219State;
+#endif
+
 typedef enum
 {
 	kWarpFlashReadingCountBitField 	= 0b1,
@@ -204,6 +209,9 @@ typedef enum
 	kWarpFlashBMX055BitField		= 0b1000000000,
 	kWarpFlashCCS811BitField		= 0b10000000000,
 	kWarpFlashHDC1000BitField		= 0b100000000000,
+
+	kWarpFlashINA219BitField		= 0b1000000000000,
+
 	kWarpFlashRV8803C7BitField		= 0b100000000000000,
 	kWarpFlashNumConfigErrors		= 0b1000000000000000,
 } WarpFlashSensorBitFieldEncoding;
@@ -1674,7 +1682,12 @@ main(void)
 #if (WARP_BUILD_ENABLE_DEVSSD1331) 
 {
 		devSSD1331init();
+		OSA_TimeDelay(100); //wait for stable current
 }
+#endif
+
+#if (WARP_BUILD_ENABLE_INA219)
+		initINA219(	0x40	/* i2cAddress */,	kWarpDefaultSupplyVoltageMillivoltsINA219);
 #endif
 
 #if (WARP_BUILD_ENABLE_DEVBMX055)
@@ -2334,6 +2347,15 @@ main(void)
 					{
 						menuTargetSensor = kWarpSensorAS7263;
 						menuI2cDevice = &deviceAS7263State;
+						break;
+					}
+#endif
+
+#if (WARP_BUILD_ENABLE_INA219)
+					case 'l':
+					{
+						menuTargetSensor = kWarpSensorINA219;
+						menuI2cDevice = &deviceINA219State;
 						break;
 					}
 #endif
@@ -3213,6 +3235,26 @@ writeAllSensorsToFlash(int menuDelayBetweenEachRun, int loopForever)
 	sensorBitField = sensorBitField | kWarpFlashMMA8451QBitField;
 #endif
 
+/*
+#if (WARP_BUILD_ENABLE_DEVINA219)
+
+	uint16_t configPackage = 
+    (kINA219ConfigRST << 15) | 
+    (kINA219Config_ << 14) | 
+    (kINA219ConfigBRNG << 13) | 
+    (kINA219ConfigPG << 11) | // 2 bits 
+    (kINA219ConfigBADC << 7) | // 4 bits 
+    (kINA219ConfigSADC << 3) | // 4 bits 
+    (kINA219ConfigMODE); // 3 bits
+
+
+	numberOfConfigErrors += configureSensorINA219(
+		configPackage
+	);
+	sensorBitField = sensorBitField | kWarpFlashINA219BitField;
+#endif
+*/
+
 #if (WARP_BUILD_ENABLE_DEVMAG3110)
 	numberOfConfigErrors += configureSensorMAG3110(
 		0x00, /*	Payload: DR 000, OS 00, 80Hz, ADC 1280, Full 16bit, standby mode
@@ -3378,6 +3420,10 @@ writeAllSensorsToFlash(int menuDelayBetweenEachRun, int loopForever)
 
 #if (WARP_BUILD_ENABLE_DEVRV8803C7)
 		bytesWrittenIndex += appendSensorDataRV8803C7(flashWriteBuf + bytesWrittenIndex);
+#endif
+
+#if (WARP_BUILD_ENABLE_INA219)
+		bytesWrittenIndex += appendSensorDataINA219(flashWriteBuf + bytesWrittenIndex);
 #endif
 
 		/*
@@ -3641,6 +3687,10 @@ printAllSensors(bool printHeadersAndCalibration, bool hexModeFlag,
 		printSensorDataHDC1000(hexModeFlag);
 #endif
 
+#if (WARP_BUILD_ENABLE_INA219)
+		printSensorDataINA219(hexModeFlag);
+#endif
+
 #if (WARP_CSVSTREAM_FLASH_PRINT_METADATA)
 		warpPrint(" %12d, %6d,", RTC->TSR, RTC->TPR);
 #endif
@@ -3873,6 +3923,37 @@ repeatRegisterReadForDeviceAndAddress(WarpSensorDevice warpSensorDevice, uint8_t
 
 			break;
 		}
+
+
+case kWarpSensorINA219:
+		{
+/*
+ *	MMA8451Q: VDD 3--5.5
+ */
+#if (WARP_BUILD_ENABLE_INA219)
+				loopForSensor(	"\r\nINA219:\n\r",		/*	tagString			*/
+						&readSensorRegisterINA219,	/*	readSensorRegisterFunction	*/
+						&deviceINA219State,		/*	i2cDeviceState			*/
+						NULL,				/*	spiDeviceState			*/
+						baseAddress,			/*	baseAddress			*/
+						0x00,				/*	minAddress			*/
+						0x05,				/*	maxAddress			*/
+						repetitionsPerAddress,		/*	repetitionsPerAddress		*/
+						chunkReadsPerAddress,		/*	chunkReadsPerAddress		*/
+						spinDelay,			/*	spinDelay			*/
+						autoIncrement,			/*	autoIncrement			*/
+						sssupplyMillivolts,		/*	sssupplyMillivolts		*/
+						referenceByte,			/*	referenceByte			*/
+						adaptiveSssupplyMaxMillivolts,	/*	adaptiveSssupplyMaxMillivolts	*/
+						chatty				/*	chatty				*/
+			);
+#else
+			warpPrint("\r\n\tINA219 Read Aborted. Device Disabled :(");
+#endif
+
+			break;
+		}
+
 
 		case kWarpSensorBME680:
 		{
@@ -4929,6 +5010,20 @@ flashDecodeSensorBitField(uint16_t sensorBitField, uint8_t sensorIndex, uint8_t*
 		{
 			*sizePerReading		= bytesPerReadingMMA8451Q;
 			*numberOfReadings = numberOfReadingsPerMeasurementMMA8451Q;
+			return;
+		}
+	}
+
+	/*
+	 * INA219
+	*/
+	if (sensorBitField & kWarpFlashINA219BitField)
+	{
+		numberOfSensorsFound++;
+		if (numberOfSensorsFound - 1 == sensorIndex)
+		{
+			*sizePerReading		= bytesPerReadingINA219;
+			*numberOfReadings = numberOfReadingsPerMeasurementINA219;
 			return;
 		}
 	}

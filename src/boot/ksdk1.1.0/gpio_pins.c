@@ -82,7 +82,19 @@ gpio_output_pin_user_config_t	outputPins[] = {
 			.config.slewRate = kPortSlowSlewRate,
 			.config.driveStrength = kPortLowDriveStrength,
 		},
-
+		
+		{
+			.pinName = kINA219PinSCL,
+			.config.outputLogic = 1,
+			.config.slewRate = kPortSlowSlewRate,
+			.config.driveStrength = kPortLowDriveStrength,
+		},
+		{
+			.pinName = kINA219PinSDA,
+			.config.outputLogic = 1,
+			.config.slewRate = kPortSlowSlewRate,
+			.config.driveStrength = kPortLowDriveStrength,
+		},
 		#if (WARP_BUILD_ENABLE_DEVIS25xP)
 		{
 			.pinName = kWarpPinIS25xP_SPI_nCS,
@@ -227,7 +239,7 @@ gpio_input_pin_user_config_t	inputPins[] = {
  *
  *	**NOTE**:	The semantics is that pins that are excluded are disabled (TODO: double check).
  */
-gpio_input_pin_user_config_t	wakeupPins[] = {
+/*gpio_input_pin_user_config_t	wakeupPins[] = {
 	{
 		.pinName = kWarpPinUnusedPTA0,
 		.config.isPullEnable = true,
@@ -239,3 +251,4 @@ gpio_input_pin_user_config_t	wakeupPins[] = {
 		.pinName = GPIO_PINS_OUT_OF_RANGE,
 	}
 };
+*/
