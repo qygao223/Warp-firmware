@@ -179,7 +179,7 @@ printSensorDataINA219(bool hexModeFlag)
 	{
 		if (hexModeFlag)
 		{
-			warpPrint("Config"," 0x%02x 0x%02x,", readSensorRegisterValueMSB, readSensorRegisterValueLSB);
+			warpPrint("Config 0x%02x 0x%02x,", readSensorRegisterValueMSB, readSensorRegisterValueLSB);
 		}
 		else
 		{
@@ -201,7 +201,7 @@ printSensorDataINA219(bool hexModeFlag)
 	{
 		if (hexModeFlag)
 		{
-			warpPrint("shunt_v"," 0x%02x 0x%02x,", readSensorRegisterValueMSB, readSensorRegisterValueLSB);
+			warpPrint("shunt_v 0x%02x 0x%02x,", readSensorRegisterValueMSB, readSensorRegisterValueLSB);
 		}
 		else
 		{
@@ -223,7 +223,7 @@ printSensorDataINA219(bool hexModeFlag)
 	{
 		if (hexModeFlag)
 		{
-			warpPrint("bus_v"," 0x%02x 0x%02x,", readSensorRegisterValueMSB, readSensorRegisterValueLSB);
+			warpPrint("bus_v 0x%02x 0x%02x,", readSensorRegisterValueMSB, readSensorRegisterValueLSB);
 		}
 		else
 		{
@@ -247,7 +247,7 @@ printSensorDataINA219(bool hexModeFlag)
 	{
 		if (hexModeFlag)
 		{
-			warpPrint("Power"," 0x%02x 0x%02x,", readSensorRegisterValueMSB, readSensorRegisterValueLSB);
+			warpPrint("Power 0x%02x 0x%02x,", readSensorRegisterValueMSB, readSensorRegisterValueLSB);
 		}
 		else
 		{
@@ -269,7 +269,7 @@ printSensorDataINA219(bool hexModeFlag)
 	{
 		if (hexModeFlag)
 		{
-			warpPrint("Current"," 0x%02x 0x%02x,", readSensorRegisterValueMSB, readSensorRegisterValueLSB);
+			warpPrint("Current 0x%02x 0x%02x,", readSensorRegisterValueMSB, readSensorRegisterValueLSB);
 		}
 		else
 		{
@@ -291,7 +291,7 @@ printSensorDataINA219(bool hexModeFlag)
 	{
 		if (hexModeFlag)
 		{
-			warpPrint("Calibration"," 0x%02x 0x%02x,", readSensorRegisterValueMSB, readSensorRegisterValueLSB);
+			warpPrint("Calibration 0x%02x 0x%02x,", readSensorRegisterValueMSB, readSensorRegisterValueLSB);
 		}
 		else
 		{
