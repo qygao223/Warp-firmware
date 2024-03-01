@@ -27,13 +27,13 @@ extern volatile uint32_t		gWarpI2cTimeoutMilliseconds;
 extern volatile uint32_t		gWarpSupplySettlingDelayMilliseconds;
 
 
-
+void set_Calibration_reg();
 void
 initINA219(const uint8_t i2cAddress, uint16_t operatingVoltageMillivolts)
 {
 	deviceINA219State.i2cAddress			= i2cAddress;
 	deviceINA219State.operatingVoltageMillivolts	= operatingVoltageMillivolts;
-
+    set_Calibration_reg();
 	return;
 }
 
@@ -364,4 +364,14 @@ appendSensorDataINA219(uint8_t* buf)
 	}
     }
 
+}
+
+void
+set_Calibration_reg()
+{
+
+    int calreg = 2740;
+
+    // Set Calibration register to 'Cal' calculated above
+    writeSensorRegisterINA219(kWarpSensorCalibrationRegisterINA219, calreg);
 }
