@@ -262,8 +262,8 @@ printSensorDataINA219(bool hexModeFlag)
     // fit MSB by shifting 8 bits and read lsb without shifting
 
 	// Change hex current into dec and current LSB is 1e-5A, actual current is the multiple of these two
-	float current_LSB = 1e-4*1000; //in mA
-	float dec_current = current_LSB*(float)readSensorRegisterValueCombined; //in mA
+	float current_LSB = 1e-4; //in A
+	float dec_current = current_LSB*readSensorRegisterValueCombined/1000; //in mA
 
 	if (i2cReadStatus != kWarpStatusOK)
 	{
@@ -277,7 +277,7 @@ printSensorDataINA219(bool hexModeFlag)
 		}
 		else
 		{
-			warpPrint("Current %d,", readSensorRegisterValueCombined);
+			warpPrint("Current %d %d,", readSensorRegisterValueCombined);
 		}
 	}
 
@@ -305,8 +305,9 @@ printSensorDataINA219(bool hexModeFlag)
 }
 
 uint8_t
-appendSensorDataINA219(uint8_t* buf)
-{
+appendSensorDataINA219()
+{	
+	uint8_t* buf;
 	uint8_t index = 0;
 	uint16_t readSensorRegisterValueLSB;
 	uint16_t readSensorRegisterValueMSB;
@@ -320,7 +321,7 @@ appendSensorDataINA219(uint8_t* buf)
 	readSensorRegisterValueMSB      = deviceINA219State.i2cBuffer[0];
 	readSensorRegisterValueLSB      = deviceINA219State.i2cBuffer[1];
 	readSensorRegisterValueCombined = (((int16_t)readSensorRegisterValueMSB & 0xFF) << 8) | (readSensorRegisterValueLSB & 0xFF);
-    
+    warpPrint("Current %d,", readSensorRegisterValueCombined);
 	if (i2cReadStatus != kWarpStatusOK)
 	{
 		buf[index] = 0;
@@ -341,32 +342,8 @@ appendSensorDataINA219(uint8_t* buf)
 		index += 1;
 
 
-    i2cReadStatus                   = readSensorRegisterINA219(kWarpSensorOutputRegisterINA219_Power, 2 /* numberOfBytes */);
-	readSensorRegisterValueMSB      = deviceINA219State.i2cBuffer[0];
-	readSensorRegisterValueLSB      = deviceINA219State.i2cBuffer[1];
-	readSensorRegisterValueCombined = (((int16_t)readSensorRegisterValueMSB & 0xFF) << 8) | (readSensorRegisterValueLSB & 0xFF);
-
-
-	if (i2cReadStatus != kWarpStatusOK)
-	{
-		buf[index] = 0;
-		index += 1;
-
-		buf[index] = 0;
-		index += 1;
-	}
-	else
-	{
-		/*
-		 * MSB first
-		 */
-		buf[index] = (uint8_t)(readSensorRegisterValueCombined >> 8);
-		index += 1;
-
-		buf[index] = (uint8_t)(readSensorRegisterValueCombined);
-		index += 1;
-	}
     }
+	warpPrint("Current,", buf);
 
 }
 

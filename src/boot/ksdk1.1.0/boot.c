@@ -2714,14 +2714,13 @@ main(void)
 			}
 			case 'y':
 			{	
-				/*warpPrint("\r\nEnter register (00)\n");
-				uint8_t reg = readHexByte();
-				warpPrint("\r\nEnter numberOfBytes (1)\n");
-				int numberOfBytes = warpWaitKey();*/
-				warpPrint("\r\n\thexModeFlag? ['0' | '1']> ");
+				/*warpPrint("\r\n\thexModeFlag? ['0' | '1']> ");
 				bool hexModeFlag = warpWaitKey() - '0';
-				printSensorDataINA219(hexModeFlag);
-			}
+				printSensorDataINA219(hexModeFlag);*/
+				for (int i = 0; i < 10; i++)
+				{
+					appendSensorDataINA219();
+				}
 #if (WARP_BUILD_ENABLE_DEVRV8803C7)
 			case 'v':
 			{
