@@ -205,7 +205,7 @@ printSensorDataINA219(bool hexModeFlag)
 		}
 		else
 		{
-			warpPrint(" %d,", readSensorRegisterValueCombined);
+			warpPrint("shunt_v %d,", readSensorRegisterValueCombined);
 		}
 	}
 
@@ -227,7 +227,7 @@ printSensorDataINA219(bool hexModeFlag)
 		}
 		else
 		{
-			warpPrint(" %d,", readSensorRegisterValueCombined);
+			warpPrint("bus_v %d,", readSensorRegisterValueCombined);
 		}
 	}
 
@@ -251,7 +251,7 @@ printSensorDataINA219(bool hexModeFlag)
 		}
 		else
 		{
-			warpPrint(" %d,", readSensorRegisterValueCombined);
+			warpPrint("Power %d,", readSensorRegisterValueCombined);
 		}
 	}
 
@@ -262,8 +262,8 @@ printSensorDataINA219(bool hexModeFlag)
     // fit MSB by shifting 8 bits and read lsb without shifting
 
 	// Change hex current into dec and current LSB is 1e-5A, actual current is the multiple of these two
-	float current_LSB = 1e-2; //in mA
-	int dec_current = current_LSB*strtol(readSensorRegisterValueCombined, NULL, 16);
+	float current_LSB = 1e-4; //in A
+	float dec_current = current_LSB*readSensorRegisterValueCombined/1000; //in mA
 
 	if (i2cReadStatus != kWarpStatusOK)
 	{
@@ -277,7 +277,7 @@ printSensorDataINA219(bool hexModeFlag)
 		}
 		else
 		{
-			warpPrint(" %d,", readSensorRegisterValueCombined, dec_current);
+			warpPrint("Current %d %d,", readSensorRegisterValueCombined, dec_current);
 		}
 	}
 
@@ -299,7 +299,7 @@ printSensorDataINA219(bool hexModeFlag)
 		}
 		else
 		{
-			warpPrint(" %d,", readSensorRegisterValueCombined);
+			warpPrint("Calibration %d,", readSensorRegisterValueCombined);
 		}
 	}
 }
