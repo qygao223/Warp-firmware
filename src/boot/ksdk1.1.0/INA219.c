@@ -277,7 +277,7 @@ printSensorDataINA219(bool hexModeFlag)
 		}
 		else
 		{
-			warpPrint("Current %d %d,", readSensorRegisterValueCombined);
+			warpPrint("Current %d,", readSensorRegisterValueCombined);
 		}
 	}
 
@@ -321,7 +321,7 @@ appendSensorDataINA219()
 	readSensorRegisterValueMSB      = deviceINA219State.i2cBuffer[0];
 	readSensorRegisterValueLSB      = deviceINA219State.i2cBuffer[1];
 	readSensorRegisterValueCombined = (((int16_t)readSensorRegisterValueMSB & 0xFF) << 8) | (readSensorRegisterValueLSB & 0xFF);
-    warpPrint("Current %d,", readSensorRegisterValueCombined);
+    	warpPrint("%d\n", readSensorRegisterValueCombined);
 	if (i2cReadStatus != kWarpStatusOK)
 	{
 		buf[index] = 0;
@@ -342,8 +342,7 @@ appendSensorDataINA219()
 		index += 1;
 
 
-    }
-	warpPrint("Current,", buf);
+    	}
 
 }
 
@@ -351,7 +350,8 @@ void
 set_Calibration_reg()
 {
 
-    int calreg = 4096;
+    int calreg = 20000;
     // Set Calibration register to 'Cal' calculated above
     writeSensorRegisterINA219(kWarpSensorCalibrationRegisterINA219, calreg);
 }
+
