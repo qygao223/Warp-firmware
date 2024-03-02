@@ -214,6 +214,8 @@ printSensorDataINA219(bool hexModeFlag)
 	readSensorRegisterValueLSB = deviceINA219State.i2cBuffer[1];
 	readSensorRegisterValueCombined = ((int16_t)readSensorRegisterValueMSB << 8) | (readSensorRegisterValueLSB); 
     // fit MSB by shifting 8 bits and read lsb without shifting
+	//then shift right shift 3 bits for bus matching
+	readSensorRegisterValueCombined = readSensorRegisterValueCombined >> 3;
 
 	if (i2cReadStatus != kWarpStatusOK)
 	{
@@ -350,7 +352,7 @@ void
 set_Calibration_reg()
 {
 
-    int calreg = 20000;
+    int calreg = 4096;
     // Set Calibration register to 'Cal' calculated above
     writeSensorRegisterINA219(kWarpSensorCalibrationRegisterINA219, calreg);
 }
