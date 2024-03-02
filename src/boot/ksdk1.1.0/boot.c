@@ -2714,14 +2714,20 @@ main(void)
 			}
 			case 'y':
 			{	
+				/*OSA_TimeDelay(100);
 				warpPrint("\r\n\thexModeFlag? ['0' | '1']> ");
-				bool hexModeFlag = warpWaitKey() - '0';
-				printSensorDataINA219(hexModeFlag);
-				/*for (int i = 0; i < 200; i++)
-				{
-					appendSensorDataINA219();
-					OSA_TimeDelay(25);
-				}*/
+				bool hexModeFlag = warpWaitKey() - '0';*/
+				printSensorDataINA219(0);
+				warpPrint("\r\n\thexModeFlag? ['0' | '1']> ");
+                                bool hexModeFlag = warpWaitKey() - '0';
+				if (hexModeFlag == 0)
+				{	
+					for (int i = 0; i < 500; i++)
+					{
+						appendSensorDataINA219();
+						OSA_TimeDelay(50);
+					}
+				}
 			}
 #if (WARP_BUILD_ENABLE_DEVRV8803C7)
 			case 'v':
