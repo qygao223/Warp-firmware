@@ -352,7 +352,7 @@ void
 set_Calibration_reg()
 {
 
-    int calreg = 4096;
+    int calreg = 20480;
     // Set Calibration register to 'Cal' calculated above
     writeSensorRegisterINA219(kWarpSensorCalibrationRegisterINA219, calreg);
 }
