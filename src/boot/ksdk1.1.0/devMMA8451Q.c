@@ -63,13 +63,13 @@ extern volatile uint32_t		gWarpI2cTimeoutMilliseconds;
 extern volatile uint32_t		gWarpSupplySettlingDelayMilliseconds;
 
 
-
 void
 initMMA8451Q(const uint8_t i2cAddress, uint16_t operatingVoltageMillivolts)
 {
 	deviceMMA8451QState.i2cAddress			= i2cAddress;
 	deviceMMA8451QState.operatingVoltageMillivolts	= operatingVoltageMillivolts;
-
+	write2a();
+	write11();
 	return;
 }
 
@@ -206,6 +206,51 @@ readSensorRegisterMMA8451Q(uint8_t deviceRegister, int numberOfBytes)
 }
 
 void
+printSensorOrientationMMA8451Q()
+{	
+	uint16_t	readSensorRegisterValueMSB;
+	WarpStatus	i2cReadStatus;
+
+	warpScaleSupplyVoltage(deviceMMA8451QState.operatingVoltageMillivolts);
+	i2cReadStatus = readSensorRegisterMMA8451Q(kWarpSensorConfigurationRegisterMMA8451QPL_CFG, 2 /* numberOfBytes */);
+	readSensorRegisterValueMSB = deviceMMA8451QState.i2cBuffer[0];
+
+	if (i2cReadStatus != kWarpStatusOK)
+	{
+		warpPrint(" ----,");
+	}
+	else
+	{
+		warpPrint(" 0x%02x,", readSensorRegisterValueMSB);
+	}
+
+
+	i2cReadStatus = readSensorRegisterMMA8451Q(kWarpSensorConfigurationRegisterMMA8451QPL_STATUS, 2 /* numberOfBytes */);
+	readSensorRegisterValueMSB = deviceMMA8451QState.i2cBuffer[0];
+
+	if (i2cReadStatus != kWarpStatusOK)
+	{
+		warpPrint(" ----,");
+	}
+	else
+	{
+		warpPrint(" 0x%02x,", readSensorRegisterValueMSB);
+	}
+
+	i2cReadStatus = readSensorRegisterMMA8451Q(kWarpSensorConfigurationRegisterMMA8451QCTRL_REG1, 2 /* numberOfBytes */);
+	readSensorRegisterValueMSB = deviceMMA8451QState.i2cBuffer[0];
+
+	if (i2cReadStatus != kWarpStatusOK)
+	{
+		warpPrint(" ----,");
+	}
+	else
+	{
+		warpPrint(" 0x%02x,", readSensorRegisterValueMSB);
+	}
+}
+
+void
 printSensorDataMMA8451Q(bool hexModeFlag)
 {
 	uint16_t	readSensorRegisterValueLSB;
@@ -213,9 +258,7 @@ printSensorDataMMA8451Q(bool hexModeFlag)
 	int16_t		readSensorRegisterValueCombined;
 	WarpStatus	i2cReadStatus;
 
-
 	warpScaleSupplyVoltage(deviceMMA8451QState.operatingVoltageMillivolts);
-
 	/*
 	 *	From the MMA8451Q datasheet:
 	 *
@@ -228,6 +271,8 @@ printSensorDataMMA8451Q(bool hexModeFlag)
 	 *	We therefore do 2-byte read transactions, for each of the registers.
 	 *	We could also improve things by doing a 6-byte read transaction.
 	 */
+
+
 	i2cReadStatus = readSensorRegisterMMA8451Q(kWarpSensorOutputRegisterMMA8451QOUT_X_MSB, 2 /* numberOfBytes */);
 	readSensorRegisterValueMSB = deviceMMA8451QState.i2cBuffer[0];
 	readSensorRegisterValueLSB = deviceMMA8451QState.i2cBuffer[1];
@@ -250,7 +295,7 @@ printSensorDataMMA8451Q(bool hexModeFlag)
 		}
 		else
 		{
-			warpPrint(" %d,", readSensorRegisterValueCombined);
+			warpPrint(" %d ", readSensorRegisterValueCombined);
 		}
 	}
 
@@ -276,7 +321,7 @@ printSensorDataMMA8451Q(bool hexModeFlag)
 		}
 		else
 		{
-			warpPrint(" %d,", readSensorRegisterValueCombined);
+			warpPrint(" %d ", readSensorRegisterValueCombined);
 		}
 	}
 
@@ -302,7 +347,7 @@ printSensorDataMMA8451Q(bool hexModeFlag)
 		}
 		else
 		{
-			warpPrint(" %d,", readSensorRegisterValueCombined);
+			warpPrint(" %d \n", readSensorRegisterValueCombined);
 		}
 	}
 }
@@ -420,4 +465,50 @@ appendSensorDataMMA8451Q(uint8_t* buf)
 		index += 1;
 	}
 	return index;
+}
+
+/*enable acc reading*/
+void write2a(){
+	uint8_t ctrl1=0x05;
+
+	writeSensorRegisterMMA8451Q(kWarpSensorConfigurationRegisterMMA8451QCTRL_REG1, ctrl1);
+}
+
+/*enable orientation reading*/
+void write11(){
+	uint8_t ctrlv=0xC0;
+
+	writeSensorRegisterMMA8451Q(kWarpSensorConfigurationRegisterMMA8451QPL_CFG, ctrlv);
+}
+
+void decideorientation(){
+	uint16_t readSensorRegisterValueLSB;
+	uint16_t readSensorRegisterValueMSB;
+	int16_t  readSensorRegisterValueCombined;
+	WarpStatus i2cReadStatus;
+	int32_t sum = 0;
+
+	for (int i=0; i<100; i++)
+		{
+			//delay for stable readings
+			OSA_TimeDelay(50);
+			i2cReadStatus                   = readSensorRegisterMMA8451Q(kWarpSensorOutputRegisterMMA8451QOUT_Z_MSB, 2 /* numberOfBytes */);
+			readSensorRegisterValueMSB      = deviceMMA8451QState.i2cBuffer[0];
+			readSensorRegisterValueLSB      = deviceMMA8451QState.i2cBuffer[1];
+			readSensorRegisterValueCombined = ((readSensorRegisterValueMSB & 0xFF) << 6) | (readSensorRegisterValueLSB >> 2);
+			// every reading in 14 bits 2's complement
+			readSensorRegisterValueCombined = (readSensorRegisterValueCombined ^ (1 << 13)) - (1 << 13);
+			sum += readSensorRegisterValueCombined;	
+		}
+	// calculate mean of collect data
+	float mean = sum/100;
+	warpPrint("sum = %d \n", sum);
+	// deicision line at x=0, if mean>0, front facing and vice versa
+	if (mean >= 0)
+	{
+		warpPrint("The board is in front facing orientation");
+	}
+	else{
+		warpPrint("The board is in back facing orientation");
+	}
 }

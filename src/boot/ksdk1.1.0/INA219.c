@@ -18,7 +18,6 @@
 #include "gpio_pins.h"
 #include "SEGGER_RTT.h"
 #include "warp.h"
-#include "INA219.h"
 
 
 extern volatile WarpI2CDeviceState  deviceINA219State;

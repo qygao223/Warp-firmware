@@ -2074,7 +2074,7 @@ main(void)
 		warpPrint("\r- 's': power up all sensors.\n");
 		warpPrint("\r- 't': dump processor state.\n");
 		warpPrint("\r- 'u': set I2C address.\n");
-		warpPrint("\r- 'y': Try read INA219.\n");
+		warpPrint("\r- 'y': Read and use MMA8451Q.\n");
 
 #if (WARP_BUILD_ENABLE_DEVAT45DB)
 		warpPrint("\r- 'R': read bytes from Flash.\n");
@@ -2714,19 +2714,26 @@ main(void)
 			}
 			case 'y':
 			{	
-				/*OSA_TimeDelay(100);
+				OSA_TimeDelay(50);
 				warpPrint("\r\n\thexModeFlag? ['0' | '1']> ");
-				bool hexModeFlag = warpWaitKey() - '0';*/
-				printSensorDataINA219(0);
-				warpPrint("\r\n\thexModeFlag? ['0' | '1']> ");
-                                bool hexModeFlag = warpWaitKey() - '0';
-				if (hexModeFlag == 0)
-				{	
-					for (int i = 0; i < 500; i++)
+				bool hexModeFlag = warpWaitKey() - '0';
+				if (hexModeFlag == 0){
+					//test if register value written and use 0x10 to directly find orientation
+					printSensorOrientationMMA8451Q();
+					// print combined and separate MSB LSB value in register
+					/*printSensorDataMMA8451Q(hexModeFlag);
+					printSensorDataMMA8451Q(1);*/
+					// print 100 data points for observation or graph drawing
+					for (int i=0; i<100; i++)
 					{
-						appendSensorDataINA219();
 						OSA_TimeDelay(50);
+						printSensorDataMMA8451Q(hexModeFlag);
 					}
+				}
+				else
+				{	
+					// decide and print front or back facing orientation 
+					decideorientation();
 				}
 			}
 #if (WARP_BUILD_ENABLE_DEVRV8803C7)
